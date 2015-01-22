@@ -26,9 +26,54 @@ var findstr = function(str, tofind) {
 	return indexes;
 }
 
+var kmp_buildtable = function(word) {
+	var ft = new Array(word.length);
+	// word.length must > 0
+	ft[0] = -1;
+	var matchPos = 0;
+	for (var i = 1; i < word.length; i++) {
+		if (word[i] === word[matchPos]) {
+			ft[i] = matchPos;
+			matchPos++;
+		} else {
+			ft[i] = 0;
+			matchPos = 0;
+		}
+	}
+
+	console.log(ft);
+	return ft;
+}
+
+var kmp_match = function(str, word, index) {
+	for (var i = 0;
+		str.charAt(index + i) === word.charAt(i) &&
+		i < word.length; i++);
+
+	return i;
+}
+
+var kmp_findstr = function(str, word, index) {
+	if (index === undefined) { index = 0; }
+	var ft = kmp_buildtable(word);
+	var i = index;
+
+	while (i < str.length) {
+		var mismatch = kmp_match(str, word, i);
+		if (mismatch === word.length) {
+			return i;
+		} else {
+			i += mismatch - ft[mismatch];
+		}
+	}
+
+	return -1;
+}
+
 function main() {
-	var str = "what a nice day at the fat bay";
-	var found = findstr(str, "at");
+	var str = "paraparents pardise paraparentsss please paraparents";
+	var word = "paraparents";
+	var found = findstr(str, word);
 	console.log(found);
 	var marker = "";
 	var prev = 0;
@@ -39,6 +84,13 @@ function main() {
 	});
 	console.log(str);
 	console.log(marker);
+
+	// now kmp
+	var index = 0;
+	while ((index = kmp_findstr(str, word, index)) != -1) {
+		console.log(index);
+		index += word.length;
+	}
 }
 
 main();
